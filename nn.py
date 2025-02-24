@@ -1,24 +1,11 @@
 # nn.py
 import numpy as np
 
-class NodeModel:
-    def __init__(self, node_type, x, y, data=None):
-        """
-        node_type: e.g. "input", "layer", "output", "control"
-        x, y: initial position on the canvas
-        data: dictionary holding node-specific parameters (for neural net computations)
-        """
-        self.node_type = node_type  
-        self.x = x
-        self.y = y
-        self.data = data or {}      
-
-# Activation functions used in the neural net computations.
 def linear(x):
     return x
 
 def sigmoid(x):
-    return 1/(1+np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
 def tanh(x):
     return np.tanh(x)
@@ -32,3 +19,22 @@ activation_functions = {
     "tanh": tanh,
     "relu": relu,
 }
+
+def run_network(x_values, layers_config):
+    """
+    A dummy feedforward pass.
+    layers_config should be a list of dictionaries, each representing a layer.
+    Each layer should have an 'activation' and a list of 'neurons', where each neuron has 'weights' and 'bias'.
+    """
+    activations = x_values
+    for layer in layers_config:
+        act = activation_functions.get(layer.get("activation", "linear"), linear)
+        outputs = []
+        for neuron in layer.get("neurons", []):
+            weights = np.array(neuron.get("weights", [1.0] * activations.shape[1]))
+            bias = neuron.get("bias", 0.0)
+            z = np.dot(activations, weights) + bias
+            outputs.append(act(z))
+        if outputs:
+            activations = np.column_stack(outputs)
+    return activations
